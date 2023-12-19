@@ -28,7 +28,7 @@ VIDEO 01
 00:00 - Intro✅
 19:10 - Section 0 - Download Github Repo✅
 24:03 - Section 1 - Navbar✅
-54:46 - Section 2 - Setting Up Routes
+54:46 - Section 2 - Setting Up Routes✅
 01:02:08 - Section 3 - User Auth. Form ( UI )
 01:37:48 - Section 4 - Page Animation
 01:48:12 - Section 5 - Server Setup + User Auth. Form Routes
@@ -37,3 +37,23 @@ VIDEO 01
 03:42:02 - Section 8 - User Navigation + Sign Out
 04:11:43 - Section 9 - Google Authentication
 04:52:12 - Outro
+
+VIDEO 02
+00:00 - Intro
+01:18 - Section 1 - Setting Up "/editor" route
+04:42 - Section 2 - Editor Page Component
+12:57 - Section 3 - Blog Editor - Navbar
+20:16 - Section 4 - Blog Editor - Banner
+31:04 - Section 5 - AWS S3 Bucket Setup
+41:34 - Section 6 - Connecting AWS to Server
+50:51 - Section 7 - Server Get Upload URL
+01:01:55 - Section 8 - Uploading Banner Image
+01:20:50 - Section 9 - Blog Title Texture
+01:35:06 - Section 10 - Editor Context
+01:53:03 - Section 11 - Blog Editor
+02:22:36 - Section 12 - Text Editor Context & Changing Editor State
+02:38:18 - Section 13 - Publish Form
+03:48:35 - Section 14 - "Create-blog" route
+04:38:20 - Section 15 - Publishing the blog
+04:56:42 - Section 16 - Saving Blog Draft
+05:08:58 - Outro ( Thanks for watching )
