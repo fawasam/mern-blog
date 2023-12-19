@@ -33,8 +33,8 @@ VIDEO 01
 01:37:48 - Section 4 - Page Animation✅
 01:48:12 - Section 5 - Server Setup + User Auth. Form Routes✅
 02:57:38 - Section 6 - Connecting Form UI to server✅
-03:29:52 - Section 7 - Store user in sessions
-03:42:02 - Section 8 - User Navigation + Sign Out
+03:29:52 - Section 7 - Store user in sessions✅
+03:42:02 - Section 8 - User Navigation + Sign Out✅
 04:11:43 - Section 9 - Google Authentication
 04:52:12 - Outro
 
