@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import User from "./Schema/User.js";
 import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
+import cors from "cors";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -23,6 +24,7 @@ mongoose
   });
 
 app.use(express.json());
+app.use(cors());
 app.get("/", (req, res) => {
   res.send("Hello from Express!");
 });
