@@ -12,6 +12,7 @@ const Navbar = () => {
   const handleUserNavPanel = () => {
     setUserNavPanel((currentVal) => !currentVal);
   };
+  console.log(access_token);
   const handleBlur = () => {
     setTimeout(() => {
       setUserNavPanel(false);

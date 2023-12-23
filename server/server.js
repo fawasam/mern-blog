@@ -6,6 +6,9 @@ import User from "./Schema/User.js";
 import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import cors from "cors";
+import path from "path";
+// import aws from "aws";
+import multer from "multer";
 //google
 import { getAuth } from "firebase-admin/auth";
 import serviceAccountKey from "./blog-app-2de5c-firebase-adminsdk-axh0x-4675b40ffe.json" assert { type: "json" };
@@ -33,9 +36,44 @@ mongoose
 
 app.use(express.json());
 app.use(cors());
+// const s3 = new aws.s3({
+//   region: "ap-south-1",
+//   accessKeyId: process.env.AWS_ACCESS_KEY,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_,
+// });
+// Set up Multer storage
+const storage = multer.diskStorage({
+  destination: "./uploads/",
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+// Initialize Multer upload
+const upload = multer({
+  storage: storage,
+}).single("image");
+
+// Handle POST request for image upload
+app.post("/upload", (req, res) => {
+  upload(req, res, (err) => {
+    if (err) {
+      res.status(400).send("Error uploading file.");
+    } else {
+      const imageUrl = "http://localhost:3000/uploads/" + req.file.filename;
+      res.status(200).json({ imageUrl: imageUrl });
+    }
+  });
+});
+
 app.get("/", (req, res) => {
   res.send("Hello from Express!");
 });
+
+app.use("/uploads", express.static("uploads"));
 
 const formatDatatoSend = (user) => {
   const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
