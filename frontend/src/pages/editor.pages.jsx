@@ -5,7 +5,7 @@ import BlogEditor from "../components/blog-editor.component";
 import PublishForm from "../components/publish-form.component";
 
 const blogStructure = {
-  title: " ",
+  title: "",
   banner: "",
   content: [],
   tags: [],

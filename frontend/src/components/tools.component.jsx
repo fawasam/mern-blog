@@ -47,7 +47,7 @@ const uploadImageByFile = (e) => {
       }
     })
     .catch((error) => {
-      toast.dismiss(loadingToast);
+      // toast.dismiss(loadingToast);
       toast.error(error);
       console.error("Error uploading image:", error);
     });
