@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 import "dotenv/config";
 import bcrypt from "bcrypt";
 import User from "./Schema/User.js";
+import Blog from "./Schema/Blog.js";
 import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import cors from "cors";
 import path from "path";
-// import aws from "aws";
+
 import multer from "multer";
 //google
 import { getAuth } from "firebase-admin/auth";
@@ -22,58 +23,6 @@ admin.initializeApp({
 
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
-
-mongoose
-  .connect(process.env.MONGO_URI, {
-    autoIndex: true,
-  })
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.error("Error connecting to MongoDB:", err.message);
-  });
-
-app.use(express.json());
-app.use(cors());
-// const s3 = new aws.s3({
-//   region: "ap-south-1",
-//   accessKeyId: process.env.AWS_ACCESS_KEY,
-//   secretAccessKey: process.env.AWS_SECRET_ACCESS_,
-// });
-// Set up Multer storage
-const storage = multer.diskStorage({
-  destination: "./uploads/",
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-// Initialize Multer upload
-const upload = multer({
-  storage: storage,
-}).single("image");
-
-// Handle POST request for image upload
-app.post("/upload", (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      res.status(400).send("Error uploading file.");
-    } else {
-      const imageUrl = "http://localhost:3000/uploads/" + req.file.filename;
-      res.status(200).json({ imageUrl: imageUrl });
-    }
-  });
-});
-
-app.get("/", (req, res) => {
-  res.send("Hello from Express!");
-});
-
-app.use("/uploads", express.static("uploads"));
 
 const formatDatatoSend = (user) => {
   const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
@@ -95,6 +44,68 @@ const generateUsername = async (email) => {
   return username;
 };
 
+const verifyJWT = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (token == null) {
+    return res.status(401).json({ error: "No access token" });
+  }
+  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: "Access token is invalid" });
+    }
+    req.user = user.id;
+    next();
+  });
+};
+
+mongoose
+  .connect(process.env.MONGO_URI, {
+    autoIndex: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((err) => {
+    console.error("Error connecting to MongoDB:", err.message);
+  });
+
+app.use(express.json());
+app.use(cors());
+
+const storage = multer.diskStorage({
+  destination: "./uploads/",
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({
+  storage: storage,
+}).single("image");
+
+app.post("/upload", (req, res) => {
+  upload(req, res, (err) => {
+    if (err) {
+      res.status(400).send("Error uploading file.");
+    } else {
+      const imageUrl = "http://localhost:3000/uploads/" + req.file.filename;
+      res.status(200).json({ imageUrl: imageUrl });
+    }
+  });
+});
+
+app.get("/", (req, res) => {
+  res.send("Hello from Express!");
+});
+
+app.use("/uploads", express.static("uploads"));
+
+//user routes
 app.post("/signup", async (req, res) => {
   const { fullname, email, password } = req.body;
 
@@ -140,7 +151,6 @@ app.post("/signup", async (req, res) => {
       });
   });
 });
-
 app.post("/signin", async (req, res) => {
   let { email, password } = req.body;
   User.findOne({ "personal_info.email": email })
@@ -172,7 +182,6 @@ app.post("/signin", async (req, res) => {
       return res.status(500).json({ error: error.message });
     });
 });
-
 app.post("/google-auth", async (req, res) => {
   let { access_token } = req.body;
   getAuth()
@@ -231,7 +240,81 @@ app.post("/google-auth", async (req, res) => {
       });
     });
 });
-// Start the server
+
+//blog routes
+app.post("/create-blog", verifyJWT, async (req, res) => {
+  let authorId = req.user;
+  let { title, desc, banner, tags, content, draft } = req.body;
+
+  if (!title.length) {
+    return res.status(403).json({ error: "You must provide a title" });
+  }
+  if (!desc.length || desc.length > 200) {
+    return res.status(403).json({
+      error: "You must provide blog description wnder 200 characters",
+    });
+  }
+  if (!banner.length) {
+    return res.status(403).json({ error: "You must provide blog banner " });
+  }
+  if (!content.blocks.length) {
+    return res
+      .status(403)
+      .json({ error: "There must be some blog content to publish it" });
+  }
+  if (!tags.length || tags.length > 10) {
+    return res.status(403).json({
+      error: "You must specify at least one tag to publish",
+    });
+  }
+
+  tags = tags.map((tag) => tag.toLowerCase());
+  let blog_id =
+    title
+      .replace(/[^a-zA-Z0-9]/g, " ")
+      .replace(/\s+/g, "-")
+      .trim() + nanoid();
+  console.log(blog_id);
+
+  let blog = new Blog({
+    title,
+    desc,
+    banner,
+    content,
+    tags,
+    author: authorId,
+    blog_id,
+    draft: Boolean(draft),
+  });
+  blog
+    .save()
+    .then((blog) => {
+      let incrementVal = draft ? 0 : 1;
+      User.findOneAndUpdate(
+        { _id: authorId },
+        {
+          $inc: { "account_info.total_posts": incrementVal },
+          $push: { blogs: blog._id },
+        }
+      )
+        .then((user) => {
+          return res.status(200).json({
+            success: "done",
+            id: blog.blog_id,
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            error: "Failed to update total posts number",
+          });
+        });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        error: err.message,
+      });
+    });
+});
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

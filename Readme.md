@@ -52,7 +52,7 @@ VIDEO 02
 01:35:06 - Section 10 - Editor Context✅
 01:53:03 - Section 11 - Blog Editor✅
 02:22:36 - Section 12 - Text Editor Context & Changing Editor State✅
-02:38:18 - Section 13 - Publish Form
+02:38:18 - Section 13 - Publish Form✅
 03:48:35 - Section 14 - "Create-blog" route
 04:38:20 - Section 15 - Publishing the blog
 04:56:42 - Section 16 - Saving Blog Draft
