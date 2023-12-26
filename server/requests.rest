@@ -23,4 +23,4 @@
 #     "tags":["tag1","tag2"]
 # }
 
-GET http://localhost:3000/latest-post 
+GET http://localhost:3000/trending-post 
