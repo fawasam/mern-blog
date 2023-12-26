@@ -65,7 +65,7 @@ VIDEO 03
 08:50 - Section 3 - Home Page - "InPageNavigation"
 37:01 - Section 4 - Home Page - "latest blogs" route
 47:48 - Section 5 - Home Page - fetching latest blogs
-56:08 - Section 6 - Home Page - Blog Card
+56:08 - Section 6 - Home Page - Blog Card✅
 01:23:24 - Section 7 - Home Page - "trending blogs" route
 01:28:51 - Section 8.1 - Home Page - fetching trending blogs
 01:31:14 - Section 8.2 - Home Page - Minimal Blog Card

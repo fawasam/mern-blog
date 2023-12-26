@@ -1,24 +1,26 @@
-# POST http://localhost:3000/signin 
+# POST http://localhost:3000/signup 
 # Content-Type: application/json
 
 # {
-    
+#     "fullname":"fawas",
 #     "email": "fawasam32@gmail.com",
 #     "password": "Fawas@01"
 # }
 
 
-POST http://localhost:3000/create-blog 
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODE5ZjJlMjcxYjNhNGYwYzBmZTM5MyIsImlhdCI6MTcwMzQ3NzU3MX0.quNJaJzyohq-O_tn4Dthhf0zWV9nCakp9w3Bm0ibfrI
+# POST http://localhost:3000/create-blog 
+# Content-Type: application/json
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODE5ZjJlMjcxYjNhNGYwYzBmZTM5MyIsImlhdCI6MTcwMzQ3NzU3MX0.quNJaJzyohq-O_tn4Dthhf0zWV9nCakp9w3Bm0ibfrI
 
-{
+# {
     
-    "title":"test",
-    "banner":"https://example.com/image-url",
-    "desc":"this is a test",
-    "content":{
-        "blocks":[1,2]
-    },
-    "tags":["tag1","tag2"]
-}
+#     "title":"test",
+#     "banner":"https://example.com/image-url",
+#     "desc":"this is a test",
+#     "content":{
+#         "blocks":[1,2]
+#     },
+#     "tags":["tag1","tag2"]
+# }
+
+GET http://localhost:3000/latest-post 

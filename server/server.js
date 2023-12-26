@@ -14,6 +14,7 @@ import multer from "multer";
 import { getAuth } from "firebase-admin/auth";
 import serviceAccountKey from "./blog-app-2de5c-firebase-adminsdk-axh0x-4675b40ffe.json" assert { type: "json" };
 import admin from "firebase-admin";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -104,53 +105,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/uploads", express.static("uploads"));
+app.use("/", userRoutes);
 
-//user routes
-app.post("/signup", async (req, res) => {
-  const { fullname, email, password } = req.body;
-
-  if (fullname.length < 3) {
-    return res
-      .status(403)
-      .json({ error: "Fullname must be at least 3 characters" });
-  }
-  if (!email.length) {
-    return res.status(403).json({ error: "Enter Email" });
-  }
-  if (!emailRegex.test(email)) {
-    return res.status(403).json({ error: "Email is invalid" });
-  }
-  if (!passwordRegex.test(password)) {
-    return res.status(403).json({
-      error:
-        "Password should be 6 to 20 characters long with a numeric, 1 lowercase and 1 uppercase letters ",
-    });
-  }
-
-  bcrypt.hash(password, 10, async (err, hashed_password) => {
-    let username = await generateUsername(email);
-    let user = new User({
-      personal_info: {
-        fullname,
-        email,
-        password: hashed_password,
-        username,
-      },
-    });
-
-    user
-      .save()
-      .then((newUser) => {
-        return res.status(200).json(formatDatatoSend(newUser));
-      })
-      .catch((err) => {
-        if (err.code == "11000") {
-          return res.status(500).json({ error: "Email already exists" });
-        }
-        return res.status(500).json({ error: err.message });
-      });
-  });
-});
 app.post("/signin", async (req, res) => {
   let { email, password } = req.body;
   User.findOne({ "personal_info.email": email })
@@ -317,6 +273,25 @@ app.post("/create-blog", verifyJWT, async (req, res) => {
       });
     });
 });
+
+app.get("/latest-post", (req, res) => {
+  let maxLimit = 5;
+  Blog.find({ draft: false })
+    .populate(
+      "author",
+      "personal_info.profile_img personal_info.username personal_info.fullname -_id"
+    )
+    .sort({ publishedAt: -1 })
+    .select("blog_id title desc banner activity tags publishedAt -_id")
+    .limit(maxLimit)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
