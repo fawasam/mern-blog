@@ -72,6 +72,7 @@ VIDEO 03
 01:40:22 - Section 9 - Home Page - Filters + Trending Blogs
 02:01:10 - Section 10 - Home Page - Filter blogs by categories
 02:10:35 - Section 11 - "NoDataMessage" Component
+
 02:16:45 - Section 12 - Pagination
 03:04:54 - Section 13 - Working Search Input
 03:09:25 - Section 14 - Search Route

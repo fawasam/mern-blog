@@ -274,7 +274,8 @@ app.post("/create-blog", verifyJWT, async (req, res) => {
     });
 });
 
-app.get("/latest-posts", (req, res) => {
+app.post("/latest-posts", (req, res) => {
+  let { page } = req.body;
   let maxLimit = 5;
   Blog.find({ draft: false })
     .populate(
@@ -283,6 +284,7 @@ app.get("/latest-posts", (req, res) => {
     )
     .sort({ publishedAt: -1 })
     .select("blog_id title desc banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
     .limit(maxLimit)
     .then((blogs) => {
       return res.status(200).json({ blogs });
@@ -315,8 +317,8 @@ app.get("/trending-posts", (req, res) => {
 });
 
 app.post("/search-posts", (req, res) => {
-  let { tag } = req.body;
-  let maxLimit = 5;
+  let { tag, page } = req.body;
+  let maxLimit = 2;
   let findQuery = {
     tags: tag,
     draft: false,
@@ -329,11 +331,36 @@ app.post("/search-posts", (req, res) => {
     )
     .sort({ publishedAt: -1 })
     .select("blog_id title desc banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
     .limit(maxLimit)
     .then((blogs) => {
       return res.status(200).json({ blogs });
     })
     .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/all-latest-blogs-posts", (req, res) => {
+  Blog.countDocuments({ draft: false })
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/search-blogs-posts", (req, res) => {
+  let { tag, page } = req.body;
+  let findQuery = { tags: tag, draft: false };
+  Blog.countDocuments(findQuery)
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
       return res.status(500).json({ error: err.message });
     });
 });
