@@ -6,24 +6,28 @@ import { activeTabRef } from "../components/inpage-navigation.component";
 import Loader from "../components/loader.component";
 import BlogPostCard from "../components/blog-post.component";
 import MinimalBlogPost from "../components/nobanner-blog-post.component";
+import NoDataMessage from "../components/nodata.component";
+
 const HomePage = () => {
   const [blogs, setBlogs] = useState(null);
   const [trendingBlogs, setTrendingBlogs] = useState(null);
   const [pageState, setPageState] = useState("home");
 
   let categories = [
-    "programming",
+    "life",
     "hollywood",
     "film making",
     "social media",
     "cooking",
+    "story telling",
     "tech",
     "finances",
     "travel",
+    "self improvement",
   ];
   const fetchLatestBlogs = () => {
     axios
-      .get(import.meta.env.VITE_SERVER_DOMAIN + "/latest-post")
+      .get(import.meta.env.VITE_SERVER_DOMAIN + "/latest-posts")
       .then(({ data }) => {
         setBlogs(data.blogs);
       })
@@ -33,7 +37,7 @@ const HomePage = () => {
   };
   const fetchTrendingBlogs = () => {
     axios
-      .get(import.meta.env.VITE_SERVER_DOMAIN + "/trending-post")
+      .get(import.meta.env.VITE_SERVER_DOMAIN + "/trending-posts")
       .then(({ data }) => {
         setTrendingBlogs(data.blogs);
       })
@@ -41,7 +45,18 @@ const HomePage = () => {
         console.log(err);
       });
   };
-
+  const fetchBlogsByCategory = () => {
+    axios
+      .post(import.meta.env.VITE_SERVER_DOMAIN + "/search-posts", {
+        tag: pageState,
+      })
+      .then(({ data }) => {
+        setBlogs(data.blogs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const loadBlogByCategory = (e) => {
     let category = e.target.innerText.toLowerCase();
     setBlogs(null);
@@ -51,10 +66,13 @@ const HomePage = () => {
     }
     setPageState(category);
   };
+
   useEffect(() => {
     activeTabRef.current.click();
     if (pageState == "home") {
       fetchLatestBlogs();
+    } else {
+      fetchBlogsByCategory();
     }
     if (!trendingBlogs) {
       fetchTrendingBlogs();
@@ -72,7 +90,7 @@ const HomePage = () => {
             <>
               {blogs == null ? (
                 <Loader />
-              ) : (
+              ) : blogs.length ? (
                 blogs.map((blog, i) => {
                   return (
                     <AnimationWrapper
@@ -86,11 +104,13 @@ const HomePage = () => {
                     </AnimationWrapper>
                   );
                 })
+              ) : (
+                <NoDataMessage message={"No blogs published"} />
               )}
             </>
             {trendingBlogs == null ? (
               <Loader />
-            ) : (
+            ) : trendingBlogs.length ? (
               trendingBlogs.map((blog, i) => {
                 return (
                   <AnimationWrapper
@@ -101,6 +121,8 @@ const HomePage = () => {
                   </AnimationWrapper>
                 );
               })
+            ) : (
+              <NoDataMessage message="No trending blogs " />
             )}
           </InPageNavigation>
         </div>
@@ -136,7 +158,7 @@ const HomePage = () => {
               </h1>
               {trendingBlogs == null ? (
                 <Loader />
-              ) : (
+              ) : trendingBlogs.length ? (
                 trendingBlogs.map((blog, i) => {
                   return (
                     <AnimationWrapper
@@ -147,6 +169,8 @@ const HomePage = () => {
                     </AnimationWrapper>
                   );
                 })
+              ) : (
+                <NoDataMessage message="No trending blogs " />
               )}
             </div>
           </div>

@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const PublishForm = () => {
   const navigate = useNavigate();
   const characterLimit = 200;
-  const tagLimit = 2;
+  const tagLimit = 10;
   let {
     blog: { title, banner, content, tags, desc },
     setEditorState,
@@ -114,12 +114,12 @@ const PublishForm = () => {
           <div className="w-full aspect-video rounded-lg overflow-hidden bg-grey mt-4">
             <img src={banner} alt="" />
           </div>
-          <h1 className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40">
+          <h1 className="text-4xl font-medium w-full h-20 outline-none resize-none mt-4 leading-tight placeholder:opacity-40">
             {title}
           </h1>
-          <p className="font-gelasio line-clamp-2 text-xl leading-7 mt-4">
+          {/* <p className="font-gelasio line-clamp-2 text-xl leading-7 mt-4">
             {desc}
-          </p>
+          </p> */}
         </div>
         <div className="border-grey lg:border-1 lg:pl-8">
           <p className="text-dark-grey lg:border-1 mb-2">Blog Title</p>
@@ -137,7 +137,7 @@ const PublishForm = () => {
             <textarea
               maxLength={characterLimit}
               defaultValue={desc}
-              placeholder="Blog Title"
+              placeholder="Blog Description"
               className="h-40 resize-none leading-7 input-box pl-4"
               onKeyDown={handleTitleKeyDown}
               onChange={handleBlogDescChange}

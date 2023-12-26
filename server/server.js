@@ -274,7 +274,7 @@ app.post("/create-blog", verifyJWT, async (req, res) => {
     });
 });
 
-app.get("/latest-post", (req, res) => {
+app.get("/latest-posts", (req, res) => {
   let maxLimit = 5;
   Blog.find({ draft: false })
     .populate(
@@ -292,7 +292,7 @@ app.get("/latest-post", (req, res) => {
     });
 });
 
-app.get("/trending-post", (req, res) => {
+app.get("/trending-posts", (req, res) => {
   let maxLimit = 5;
   Blog.find({ draft: false })
     .populate(
@@ -313,6 +313,31 @@ app.get("/trending-post", (req, res) => {
       return res.status(500).json({ error: err.message });
     });
 });
+
+app.post("/search-posts", (req, res) => {
+  let { tag } = req.body;
+  let maxLimit = 5;
+  let findQuery = {
+    tags: tag,
+    draft: false,
+  };
+
+  Blog.find(findQuery)
+    .populate(
+      "author",
+      "personal_info.profile_img personal_info.username personal_info.fullname -_id"
+    )
+    .sort({ publishedAt: -1 })
+    .select("blog_id title desc banner activity tags publishedAt -_id")
+    .limit(maxLimit)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
