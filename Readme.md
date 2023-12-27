@@ -74,7 +74,7 @@ VIDEO 03
 02:10:35 - Section 11 - "NoDataMessage" Component
 
 02:16:45 - Section 12 - Pagination
-03:04:54 - Section 13 - Working Search Input
+03:04:54 - Section 13 - Working Search Input✅
 03:09:25 - Section 14 - Search Route
 03:12:33 - Section 15 - Search Page
 03:33:35 - Section 16 - Searching User

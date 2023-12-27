@@ -316,13 +316,32 @@ app.get("/trending-posts", (req, res) => {
     });
 });
 
+app.post("/all-latest-blogs-posts", (req, res) => {
+  Blog.countDocuments({ draft: false })
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
 app.post("/search-posts", (req, res) => {
-  let { tag, page } = req.body;
+  let { tag, query, page } = req.body;
   let maxLimit = 2;
-  let findQuery = {
-    tags: tag,
-    draft: false,
-  };
+  let findQuery;
+  if (tag) {
+    findQuery = {
+      tags: tag,
+      draft: false,
+    };
+  } else if (query) {
+    findQuery = {
+      title: new RegExp(query, "i"),
+      draft: false,
+    };
+  }
 
   Blog.find(findQuery)
     .populate(
@@ -341,20 +360,20 @@ app.post("/search-posts", (req, res) => {
     });
 });
 
-app.post("/all-latest-blogs-posts", (req, res) => {
-  Blog.countDocuments({ draft: false })
-    .then((count) => {
-      return res.status(200).json({ totalDocs: count });
-    })
-    .catch((err) => {
-      console.log(err.message);
-      return res.status(500).json({ error: err.message });
-    });
-});
-
-app.post("/search-blogs-posts", (req, res) => {
-  let { tag, page } = req.body;
-  let findQuery = { tags: tag, draft: false };
+app.post("/search-posts-count", (req, res) => {
+  let { tag, query } = req.body;
+  let findQuery;
+  if (tag) {
+    findQuery = {
+      tags: tag,
+      draft: false,
+    };
+  } else if (query) {
+    findQuery = {
+      title: new RegExp(query, "i"),
+      draft: false,
+    };
+  }
   Blog.countDocuments(findQuery)
     .then((count) => {
       return res.status(200).json({ totalDocs: count });
