@@ -8,10 +8,12 @@ import NoDataMessage from "../components/nodata.component";
 import LoadMoreDataBtn from "../components/load-more.component";
 import axios from "axios";
 import { filterPaginationData } from "../common/filter-pagination-data";
+import UserCard from "../components/usercard.component";
 
 const SearchPage = () => {
   let { query } = useParams();
   const [blogs, setBlogs] = useState(null);
+  const [users, setUsers] = useState(null);
   const [pageState, setPageState] = useState("home");
 
   const searchBlogs = ({ page = 1, create_new_arr = false }) => {
@@ -36,13 +38,52 @@ const SearchPage = () => {
       });
   };
 
+  const fetchUsers = () => {
+    axios
+      .post(import.meta.env.VITE_SERVER_DOMAIN + "/search-users", {
+        query,
+      })
+      .then(({ data: { users } }) => {
+        console.log(users);
+        setUsers(users);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const resetState = () => {
     setBlogs(null);
+    setUsers(null);
+  };
+
+  const UserCardWrapper = () => {
+    return (
+      <>
+        {users == null ? (
+          <Loader />
+        ) : users.length ? (
+          users.map((user, i) => {
+            return (
+              <AnimationWrapper
+                key={i}
+                transition={{ duration: 1, delay: i * 0.08 }}
+              >
+                <UserCard user={user} />
+              </AnimationWrapper>
+            );
+          })
+        ) : (
+          <NoDataMessage message="No user found" />
+        )}
+      </>
+    );
   };
 
   useEffect(() => {
     resetState();
     searchBlogs({ page: 1, create_new_arr: true });
+    fetchUsers();
   }, [query]);
 
   return (
@@ -74,7 +115,15 @@ const SearchPage = () => {
             )}
             <LoadMoreDataBtn state={blogs} fetchDataFun={searchBlogs} />
           </>
+          <UserCardWrapper />
         </InpageNavigation>
+      </div>
+      <div className="min-w-[40%] lg:min-w-[350px] max-w-min border-l border-grey pl-8 pt-3 max-md:hidden">
+        <h1 className="font-medium text-xl mb-8">
+          Users related to search
+          <i className="fi fi-rr-user ml-2"></i>
+        </h1>
+        <UserCardWrapper />
       </div>
     </section>
   );

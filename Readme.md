@@ -78,7 +78,7 @@ VIDEO 03
 03:09:25 - Section 14 - Search Route
 03:12:33 - Section 15 - Search Page
 03:33:35 - Section 16 - Searching User
-03:40:15 - Section 17 - Search - User Card
+03:40:15 - Section 17 - Search - User Card✅
 03:56:00 - Section 18 - 404 Page
 04:06:46 - Section 19 - User Route
 04:09:09 - Section 20 - User Profile Page

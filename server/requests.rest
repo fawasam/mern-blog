@@ -23,4 +23,10 @@
 #     "tags":["tag1","tag2"]
 # }
 
-GET http://localhost:3000/trending-post 
+# GET http://localhost:3000/trending-post 
+POST http://localhost:3000/search-users 
+Content-Type: application/json
+
+{
+    "query":"fawas"
+}
