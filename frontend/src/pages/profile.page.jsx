@@ -5,6 +5,12 @@ import AnimationWrapper from "../common/page-animation";
 import Loader from "../components/loader.component";
 import { UserContext } from "../App";
 import AboutUser from "../components/about.component";
+import { filterPaginationData } from "../common/filter-pagination-data";
+import InPageNavigation from "../components/inpage-navigation.component";
+import BlogPostCard from "../components/blog-post.component";
+import NoDataMessage from "../components/nodata.component";
+import LoadMoreDataBtn from "../components/load-more.component";
+import PageNotFound from "./404.page";
 
 export const profileDataStructure = {
   personal_info: {
@@ -35,6 +41,8 @@ const ProfilePage = () => {
 
   const [profile, setProfile] = useState(profileDataStructure);
   const [loading, setLoading] = useState(true);
+  const [blogs, setBlogs] = useState(null);
+  const [profileLoaded, setProfileLoaded] = useState("");
   let username = useContext(UserContext)?.userAuth?.username || null;
 
   let {
@@ -56,7 +64,11 @@ const ProfilePage = () => {
         username: profileId,
       })
       .then(({ data: user }) => {
-        setProfile(user);
+        if (user != null) {
+          setProfile(user);
+        }
+        setProfileLoaded(profileId);
+        getBlogs({ user_id: user._id });
         setLoading(false);
       })
       .catch((err) => {
@@ -66,20 +78,51 @@ const ProfilePage = () => {
   };
   const resetState = () => {
     setProfile(profileDataStructure);
+    setBlogs(null);
     setLoading(true);
+    setProfileLoaded("");
+  };
+
+  const getBlogs = ({ page = 1, user_id }) => {
+    user_id = user_id == undefined ? blogs.user_id : user_id;
+    axios
+      .post(import.meta.env.VITE_SERVER_DOMAIN + "/search-posts", {
+        author: user_id,
+        page,
+      })
+      .then(async ({ data }) => {
+        let formatedData = await filterPaginationData({
+          state: blogs,
+          data: data.blogs,
+          page,
+          countRoute: "/search-posts-count",
+          data_to_send: { author: user_id },
+        });
+        formatedData.user_id = user_id;
+        setBlogs(formatedData);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
   };
   useEffect(() => {
-    resetState();
-    fetchUserProfile();
+    if (profileId != profileLoaded) {
+      setBlogs(null);
+    }
+    if (blogs == null) {
+      resetState();
+      fetchUserProfile();
+    }
   }, [profileId]);
 
   return (
     <AnimationWrapper>
       {loading ? (
         <Loader />
-      ) : (
+      ) : profile_username.length ? (
         <section className="h-cover md:flex flex-row-reverse items-start gap-5 min-[1100px]:gap-12 ">
-          <div className="flex flex-col max-md:items-center gap-5 min-w-[250px]">
+          <div className="flex flex-col max-md:items-center gap-5 min-w-[250px] md:w-[50%] md:pl-8 md:border-l border-grey md:sticky md:top-[100px] md:py-10">
             <img
               src={profile_img}
               alt={profile_username}
@@ -102,9 +145,50 @@ const ProfilePage = () => {
                 </Link>
               )}
             </div>
-            <AboutUser />
+            <AboutUser
+              className="max-md:hidden"
+              bio={bio}
+              joinedAt={joinedAt}
+              social_links={social_links}
+            />
+          </div>
+          <div className="max-md:mt-12 w-full">
+            <InPageNavigation
+              routes={["Blogs Published", "About"]}
+              defaultHidden={["About"]}
+            >
+              <>
+                {blogs == null ? (
+                  <Loader />
+                ) : blogs.results.length ? (
+                  blogs.results.map((blog, i) => {
+                    return (
+                      <AnimationWrapper
+                        transition={{ duration: 1, delay: i * 0.1 }}
+                        key={i}
+                      >
+                        <BlogPostCard
+                          content={blog}
+                          author={blog.author.personal_info}
+                        />
+                      </AnimationWrapper>
+                    );
+                  })
+                ) : (
+                  <NoDataMessage message={"No blogs published"} />
+                )}
+                <LoadMoreDataBtn state={blogs} fetchDataFun={getBlogs} />
+              </>
+              <AboutUser
+                bio={bio}
+                joinedAt={joinedAt}
+                social_links={social_links}
+              />
+            </InPageNavigation>
           </div>
         </section>
+      ) : (
+        <PageNotFound />
       )}
     </AnimationWrapper>
   );

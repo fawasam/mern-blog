@@ -329,7 +329,7 @@ app.post("/all-latest-blogs-posts", (req, res) => {
 });
 
 app.post("/search-posts", (req, res) => {
-  let { tag, query, page } = req.body;
+  let { tag, query, author, page } = req.body;
   let maxLimit = 2;
   let findQuery;
   if (tag) {
@@ -340,6 +340,11 @@ app.post("/search-posts", (req, res) => {
   } else if (query) {
     findQuery = {
       title: new RegExp(query, "i"),
+      draft: false,
+    };
+  } else if (author) {
+    findQuery = {
+      author,
       draft: false,
     };
   }

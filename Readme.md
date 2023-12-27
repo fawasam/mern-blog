@@ -81,7 +81,7 @@ VIDEO 03
 03:40:15 - Section 17 - Search - User Card✅
 03:56:00 - Section 18 - 404 Page
 04:06:46 - Section 19 - User Route
-04:09:09 - Section 20 - User Profile Page
+04:09:09 - Section 20 - User Profile Page✅
 04:44:34 - Section 21 - User Profile Page - "About User"
 05:05:22 - Section 22 - User Profile Page - Rendering Blogs
 
