@@ -44,7 +44,6 @@ const SearchPage = () => {
         query,
       })
       .then(({ data: { users } }) => {
-        console.log(users);
         setUsers(users);
       })
       .catch((err) => {

@@ -107,6 +107,7 @@ app.get("/", (req, res) => {
 app.use("/uploads", express.static("uploads"));
 app.use("/", userRoutes);
 
+//user routes
 app.post("/signin", async (req, res) => {
   let { email, password } = req.body;
   User.findOne({ "personal_info.email": email })
@@ -393,6 +394,20 @@ app.post("/search-users", (req, res) => {
     )
     .then((users) => {
       return res.status(200).json({ users });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/get-profile", (req, res) => {
+  let { username } = req.body;
+
+  User.findOne({ "personal_info.username": username })
+    .select("-personal_info.password -google_auth -updatedAt -blogs")
+    .then((user) => {
+      return res.status(200).json(user);
     })
     .catch((err) => {
       console.log(err.message);

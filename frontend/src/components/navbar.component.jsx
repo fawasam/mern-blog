@@ -8,13 +8,12 @@ const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(true);
   const [userNavPanel, setUserNavPanel] = useState(false);
 
-  let {
-    userAuth: { access_token, profile_img },
-  } = useContext(UserContext);
+  let access_token = useContext(UserContext)?.userAuth?.access_token || null;
+  let profile_img = useContext(UserContext)?.userAuth?.profile_img || null;
+
   const handleUserNavPanel = () => {
     setUserNavPanel((currentVal) => !currentVal);
   };
-
   const handleBlur = () => {
     setTimeout(() => {
       setUserNavPanel(false);

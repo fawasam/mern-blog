@@ -24,9 +24,9 @@
 # }
 
 # GET http://localhost:3000/trending-post 
-POST http://localhost:3000/search-users 
+POST http://localhost:3000/get-profile
 Content-Type: application/json
 
 {
-    "query":"fawas"
+    "username":"fawasam5"
 }
