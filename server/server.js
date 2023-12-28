@@ -8,9 +8,7 @@ import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import cors from "cors";
 import path from "path";
-
 import multer from "multer";
-//google
 import { getAuth } from "firebase-admin/auth";
 import serviceAccountKey from "./blog-app-2de5c-firebase-adminsdk-axh0x-4675b40ffe.json" assert { type: "json" };
 import admin from "firebase-admin";
@@ -21,9 +19,6 @@ const PORT = process.env.PORT || 3000;
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey),
 });
-
-let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
-let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
 const formatDatatoSend = (user) => {
   const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
@@ -413,6 +408,35 @@ app.post("/get-profile", (req, res) => {
     .select("-personal_info.password -google_auth -updatedAt -blogs")
     .then((user) => {
       return res.status(200).json(user);
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/get-posts", (req, res) => {
+  let { blog_id } = req.body;
+  let incrementVal = 1;
+
+  Blog.findOneAndUpdate(
+    { blog_id },
+    { $inc: { "activity.total_reads": incrementVal } }
+  )
+    .populate(
+      "author",
+      "personal_info.profile_img personal_info.username personal_info.fullname"
+    )
+    .select("blog_id title desc banner content activity tags publishedAt ")
+    .then((blog) => {
+      User.findOneAndUpdate(
+        { "personal_info.username": blog.author.personal_info.username },
+        { $inc: { "account_info.total_reads": incrementVal } }
+      ).catch((err) => {
+        console.log(err.message);
+        return res.status(500).json({ error: err.message });
+      });
+      return res.status(200).json({ blog });
     })
     .catch((err) => {
       console.log(err.message);

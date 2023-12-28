@@ -24,9 +24,16 @@
 # }
 
 # GET http://localhost:3000/trending-post 
-POST http://localhost:3000/get-profile
+POST http://localhost:3000/get-posts
 Content-Type: application/json
 
 {
-    "username":"fawasam5"
+    "blog_id":"AI-predictions-Top-13-AI-trends-for-20246VcbasMRYdbpG8ZiXLb5w"
 }
+
+# POST http://localhost:3000/get-profile
+# Content-Type: application/json
+
+# {
+#     "username":"fawasam5"
+# }
