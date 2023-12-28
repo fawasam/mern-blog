@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import AnimationWrapper from "../common/page-animation";
 import InPageNavigation from "../components/inpage-navigation.component";
@@ -9,22 +9,25 @@ import MinimalBlogPost from "../components/nobanner-blog-post.component";
 import NoDataMessage from "../components/nodata.component";
 import { filterPaginationData } from "../common/filter-pagination-data";
 import LoadMoreDataBtn from "../components/load-more.component";
+import { Link, useParams } from "react-router-dom";
+import { getDay } from "../common/date";
+import BlogInteraction from "../components/blog-interaction.component";
 
-export const blogDataStructure = {
+export const blogStructure = {
   title: "",
   desc: "",
   content: [],
-  tags: [],
+
   author: { personal_info: {} },
   banner: "",
   publishedAt: "",
 };
 
-import { useParams } from "react-router-dom";
-
+export const BlogContext = createContext({});
 const BlogPage = () => {
   let { blog_id } = useParams();
-  const [blog, setBlog] = useState(blogDataStructure);
+  const [blog, setBlog] = useState(blogStructure);
+  const [similarBlogs, setSimilarBlogs] = useState(null);
   const [loading, setLoading] = useState(true);
 
   let {
@@ -33,8 +36,9 @@ const BlogPage = () => {
     content,
     banner,
     publishedAt,
+
     author: {
-      personal_info: { username, fullname, profile_img },
+      personal_info: { username: author_username, fullname, profile_img },
     },
   } = blog;
 
@@ -43,6 +47,20 @@ const BlogPage = () => {
       .post(import.meta.env.VITE_SERVER_DOMAIN + "/get-posts", { blog_id })
       .then(async ({ data: { blog } }) => {
         setBlog(blog);
+        axios
+          .post(import.meta.env.VITE_SERVER_DOMAIN + "/search-posts", {
+            tag: blog.tags[0],
+            limit: 6,
+            eliminate_blog: blog_id,
+          })
+          .then(async ({ data }) => {
+            setSimilarBlogs(data.blogs);
+          })
+          .catch((err) => {
+            console.log(err);
+            setLoading(false);
+          });
+
         setLoading(false);
       })
       .catch((err) => {
@@ -50,26 +68,78 @@ const BlogPage = () => {
         setLoading(false);
       });
   };
+  const resetState = () => {
+    setBlog(blogStructure);
+    setSimilarBlogs(null);
+    setLoading(true);
+  };
   useEffect(() => {
+    resetState();
     fetchBlog();
-  }, []);
+  }, [blog_id]);
   return (
     <AnimationWrapper>
       {loading ? (
         <Loader />
       ) : (
-        <div className=" max-w-[900px]center py-10 max-lg:px-[5vw]">
-          <img src={banner} alt="banner" className="aspect-video" />
+        <BlogContext.Provider value={{ blog, setBlog }}>
+          <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
+            <img src={banner} alt="banner" className="aspect-video" />
+            {/* title ande author details  */}
+            <div className="mt-12">
+              <h2>{title}</h2>
 
-          <div className="mt-12">
-            <h2>{title}</h2>
-            <div className="flex max-sm:flex-col justify-between my-8 ">
-              <div>
-                <img src={profile_img} alt="profile image" />
+              {/* user details  */}
+
+              <div className="flex max-sm:flex-col justify-between my-8 ">
+                <div className="flex gap-5 items-start">
+                  <img
+                    src={profile_img}
+                    alt="profile image"
+                    className="w-12 h-12 rounded-full"
+                  />
+                  <p className="capitalize">
+                    {fullname}
+                    <br />@
+                    <Link className="underline" to={`/user/${author_username}`}>
+                      {author_username}
+                    </Link>
+                  </p>
+                </div>
+                <p className="text-dark-grey opacity-75 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5">
+                  Published on {getDay(publishedAt)}
+                </p>
               </div>
             </div>
+            <BlogInteraction />
+            {/* Blog content will go over here */}
+            <BlogInteraction />
+            {/* similar blogs will go over here  */}
+            {similarBlogs != null && similarBlogs.length ? (
+              <>
+                <h1 className="text-2xl mt-14 mb-10 font-medium ">
+                  Similar Blogs
+                </h1>
+
+                {similarBlogs.map((blog, i) => {
+                  let {
+                    author: { personal_info },
+                  } = blog;
+                  return (
+                    <AnimationWrapper
+                      key={i}
+                      transition={{ duration: 1, delay: i * 0.08 }}
+                    >
+                      <BlogPostCard content={blog} author={personal_info} />
+                    </AnimationWrapper>
+                  );
+                })}
+              </>
+            ) : (
+              ""
+            )}
           </div>
-        </div>
+        </BlogContext.Provider>
       )}
     </AnimationWrapper>
   );

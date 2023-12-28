@@ -324,13 +324,14 @@ app.post("/all-latest-blogs-posts", (req, res) => {
 });
 
 app.post("/search-posts", (req, res) => {
-  let { tag, query, author, page } = req.body;
-  let maxLimit = 2;
+  let { tag, query, author, page, limit, eliminate_blog } = req.body;
+  let maxLimit = limit ? limit : 2;
   let findQuery;
   if (tag) {
     findQuery = {
       tags: tag,
       draft: false,
+      blog_id: { $ne: eliminate_blog },
     };
   } else if (query) {
     findQuery = {
