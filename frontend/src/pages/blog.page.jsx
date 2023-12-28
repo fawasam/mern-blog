@@ -12,6 +12,7 @@ import LoadMoreDataBtn from "../components/load-more.component";
 import { Link, useParams } from "react-router-dom";
 import { getDay } from "../common/date";
 import BlogInteraction from "../components/blog-interaction.component";
+import BlogContent from "../components/blog-content.component";
 
 export const blogStructure = {
   title: "",
@@ -113,6 +114,16 @@ const BlogPage = () => {
             </div>
             <BlogInteraction />
             {/* Blog content will go over here */}
+
+            <div className="my-12 font-gelasio blog-page-content">
+              {content[0].blocks.map((block, i) => {
+                return (
+                  <div key={i} className="my-4 md:my-8">
+                    <BlogContent block={block} />
+                  </div>
+                );
+              })}
+            </div>
             <BlogInteraction />
             {/* similar blogs will go over here  */}
             {similarBlogs != null && similarBlogs.length ? (

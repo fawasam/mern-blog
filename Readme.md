@@ -93,7 +93,7 @@ VIDEO 04
 29:39 - Section 4 - Blog Page
 42:31 - Section 5 - "BlogInteraction" Component
 01:00:40: - Section 6 - Blog Page - Similar Blogs
-01:17:19 - Section 7 - Blog Page rendering content
+01:17:19 - Section 7 - Blog Page rendering content✅
 01:36:54 - Section 8 - Edit Blog
 02:02:52 - Section 9 - Like Blog
 02:48:33 - Section 10 - Comments - Comments Wrapper
