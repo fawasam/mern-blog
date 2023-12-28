@@ -10,7 +10,7 @@ import EditorJS from "@editorjs/editorjs";
 import { useEffect } from "react";
 import { tools } from "./tools.component";
 import { UserContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const handleBannerUpload = (e) => {
   let img = e.target.files[0];
@@ -40,6 +40,7 @@ export const handleBannerUpload = (e) => {
 };
 const BlogEditor = () => {
   const navigate = useNavigate();
+  const { blog_id } = useParams();
   let {
     blog: { title, banner, content, tags, desc },
     blog,
@@ -48,13 +49,15 @@ const BlogEditor = () => {
     setTextEditor,
     setEditorState,
   } = useContext(EditorContext);
+
   let access_token = useContext(UserContext)?.userAuth?.access_token || null;
+
   useEffect(() => {
     if (!textEditor.isReady) {
       setTextEditor(
         new EditorJS({
           holderId: "textEditor",
-          data: content,
+          data: Array.isArray(content) ? content[0] : content,
           tools: tools,
           placeholder: "Let's write an awesome story",
         })
@@ -146,11 +149,15 @@ const BlogEditor = () => {
         };
 
         axios
-          .post(import.meta.env.VITE_SERVER_DOMAIN + "/create-blog", blogObj, {
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-            },
-          })
+          .post(
+            import.meta.env.VITE_SERVER_DOMAIN + "/create-blog",
+            { ...blogObj, id: blog_id },
+            {
+              headers: {
+                Authorization: `Bearer ${access_token}`,
+              },
+            }
+          )
           .then(() => {
             e.target.classList.remove("disable");
             toast.dismiss(loadingToast);
