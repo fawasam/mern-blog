@@ -28,6 +28,8 @@ const BlogPage = () => {
   const [similarBlogs, setSimilarBlogs] = useState(null);
   const [loading, setLoading] = useState(true);
   const [islikedByUser, setIslikedByUser] = useState(false);
+  const [commentWrapper, setCommentWrapper] = useState(true);
+  const [totalParenrCommentsLoaded, setTotalParenrCommentsLoaded] = useState(0);
 
   let {
     title,
