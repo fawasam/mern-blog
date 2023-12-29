@@ -1,8 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import AnimationWrapper from "../common/page-animation";
-import InPageNavigation from "../components/inpage-navigation.component";
-import { activeTabRef } from "../components/inpage-navigation.component";
 import Loader from "../components/loader.component";
 import BlogPostCard from "../components/blog-post.component";
 import { Link, useParams } from "react-router-dom";
