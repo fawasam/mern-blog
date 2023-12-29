@@ -4,6 +4,7 @@ import "dotenv/config";
 import bcrypt from "bcrypt";
 import User from "./Schema/User.js";
 import Blog from "./Schema/Blog.js";
+import Notification from "./Schema/Notification.js";
 import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import cors from "cors";
@@ -470,6 +471,63 @@ app.post("/get-posts", (req, res) => {
           .json({ error: "you can not access draft blogs" });
       }
       return res.status(200).json({ blog });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/like-post", verifyJWT, (req, res) => {
+  let user_id = req.user;
+
+  let { _id, islikedByUser } = req.body;
+
+  let incrementVal = !islikedByUser ? 1 : -1;
+
+  Blog.findOneAndUpdate(
+    { _id },
+    { $inc: { "activity.total_likes": incrementVal } }
+  )
+    .then((blog) => {
+      if (!islikedByUser) {
+        let like = new Notification({
+          type: "like",
+          blog: blog._id,
+          notification_for: blog.author,
+          user: user_id,
+        });
+        like.save().then((notification) => {
+          return res.status(200).json({ liked_By_User: true });
+        });
+      } else {
+        Notification.findOneAndDelete({
+          user: user_id,
+          type: "like",
+          blog: _id,
+        })
+          .then((data) => {
+            return res.status(200).json({ liked_By_User: false });
+          })
+          .catch((err) => {
+            console.log(err.message);
+            return res.status(500).json({ error: err.message });
+          });
+      }
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/isliked-by-user", verifyJWT, (req, res) => {
+  let user_id = req.user;
+  let { _id } = req.body;
+
+  Notification.exists({ user: user_id, type: "like", blog: _id })
+    .then((result) => {
+      return res.status(200).json({ result });
     })
     .catch((err) => {
       console.log(err.message);

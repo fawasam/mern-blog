@@ -23,9 +23,11 @@ export const blogStructure = {
 export const BlogContext = createContext({});
 const BlogPage = () => {
   let { blog_id } = useParams();
+
   const [blog, setBlog] = useState(blogStructure);
   const [similarBlogs, setSimilarBlogs] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [islikedByUser, setIslikedByUser] = useState(false);
 
   let {
     title,
@@ -33,7 +35,6 @@ const BlogPage = () => {
     content,
     banner,
     publishedAt,
-
     author: {
       personal_info: { username: author_username, fullname, profile_img },
     },
@@ -79,7 +80,9 @@ const BlogPage = () => {
       {loading ? (
         <Loader />
       ) : (
-        <BlogContext.Provider value={{ blog, setBlog }}>
+        <BlogContext.Provider
+          value={{ blog, setBlog, islikedByUser, setIslikedByUser }}
+        >
           <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
             <img src={banner} alt="banner" className="aspect-video" />
             {/* title ande author details  */}
