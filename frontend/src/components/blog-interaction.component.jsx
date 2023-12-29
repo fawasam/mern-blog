@@ -21,6 +21,7 @@ const BlogInteraction = () => {
     setBlog,
     islikedByUser,
     setIslikedByUser,
+    setCommentsWrapper,
   } = useContext(BlogContext);
 
   let username = useContext(UserContext)?.userAuth?.username || null;
@@ -106,7 +107,10 @@ const BlogInteraction = () => {
 
           {/* comment  */}
 
-          <button className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80">
+          <button
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80"
+            onClick={() => setCommentsWrapper((prev) => !prev)}
+          >
             <i className="fi fi-rr-comment-dots"></i>
           </button>
           <p className="text-xl text-dark-grey">{total_comments}</p>

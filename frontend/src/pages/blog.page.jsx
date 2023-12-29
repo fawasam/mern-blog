@@ -9,12 +9,12 @@ import { Link, useParams } from "react-router-dom";
 import { getDay } from "../common/date";
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogContent from "../components/blog-content.component";
+import CommentsContainer from "../components/comments.component";
 
 export const blogStructure = {
   title: "",
   desc: "",
   content: [],
-
   author: { personal_info: {} },
   banner: "",
   publishedAt: "",
@@ -28,8 +28,8 @@ const BlogPage = () => {
   const [similarBlogs, setSimilarBlogs] = useState(null);
   const [loading, setLoading] = useState(true);
   const [islikedByUser, setIslikedByUser] = useState(false);
-  const [commentWrapper, setCommentWrapper] = useState(true);
-  const [totalParenrCommentsLoaded, setTotalParenrCommentsLoaded] = useState(0);
+  const [commentsWrapper, setCommentsWrapper] = useState(true);
+  const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0);
 
   let {
     title,
@@ -68,23 +68,38 @@ const BlogPage = () => {
         setLoading(false);
       });
   };
+
   const resetState = () => {
     setBlog(blogStructure);
     setSimilarBlogs(null);
     setLoading(true);
+    setCommentsWrapper(false);
+    setTotalParentCommentsLoaded(0);
   };
+
   useEffect(() => {
     resetState();
     fetchBlog();
   }, [blog_id]);
+
   return (
     <AnimationWrapper>
       {loading ? (
         <Loader />
       ) : (
         <BlogContext.Provider
-          value={{ blog, setBlog, islikedByUser, setIslikedByUser }}
+          value={{
+            blog,
+            setBlog,
+            islikedByUser,
+            setIslikedByUser,
+            commentsWrapper,
+            setCommentsWrapper,
+            totalParentCommentsLoaded,
+            setTotalParentCommentsLoaded,
+          }}
         >
+          <CommentsContainer />
           <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
             <img src={banner} alt="banner" className="aspect-video" />
             {/* title ande author details  */}
