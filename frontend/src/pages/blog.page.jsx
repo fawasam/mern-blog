@@ -7,10 +7,13 @@ import { Link, useParams } from "react-router-dom";
 import { getDay } from "../common/date";
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogContent from "../components/blog-content.component";
-import CommentsContainer from "../components/comments.component";
+import CommentsContainer, {
+  fetchComments,
+} from "../components/comments.component";
 
 export const blogStructure = {
   title: "",
+  _id: "",
   desc: "",
   content: [],
   author: { personal_info: {} },
@@ -44,6 +47,10 @@ const BlogPage = () => {
     axios
       .post(import.meta.env.VITE_SERVER_DOMAIN + "/get-posts", { blog_id })
       .then(async ({ data: { blog } }) => {
+        blog.comments = await fetchComments({
+          blog_id: blog._id,
+          setParentCommentCountFun: setTotalParentCommentsLoaded,
+        });
         setBlog(blog);
         axios
           .post(import.meta.env.VITE_SERVER_DOMAIN + "/search-posts", {
@@ -130,7 +137,7 @@ const BlogPage = () => {
             {/* Blog content will go over here */}
 
             <div className="my-12 font-gelasio blog-page-content">
-              {content[0].blocks.map((block, i) => {
+              {content[0]?.blocks?.map((block, i) => {
                 return (
                   <div key={i} className="my-4 md:my-8">
                     <BlogContent block={block} />

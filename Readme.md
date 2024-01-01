@@ -96,7 +96,7 @@ VIDEO 04
 01:17:19 - Section 7 - Blog Page rendering content✅
 01:36:54 - Section 8 - Edit Blog
 02:02:52 - Section 9 - Like Blog
-02:48:33 - Section 10 - Comments - Comments Wrapper
+02:48:33 - Section 10 - Comments - Comments Wrapper✅
 03:17:11 - Section 11 - Comments - Creating Comments in DB
 03:53:48 - Section 12 - Comments - Fetching Comment
 04:10:47 - Section 13 - Comments - Creating Comments cards
@@ -105,3 +105,12 @@ VIDEO 04
 05:06:05 - Section 16 - Comments - Hiding & Loading Replies
 05:34:28 - Section 17 - Comments - Deleting Comments & replies
 06:08:27 - Outro
+
+VIDEO 05
+00:00 - Intro
+00:35 - Section 1 - Load more replies
+23:46 - Section 2 - "settings" route
+27:41 - Section 3 - Side Navbar
+01:09:22 - Section 4 - Change password form
+01:56:35 - Section 5 - Edit Profile Page
+03:36:00 - Outro
