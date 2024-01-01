@@ -4,7 +4,12 @@ import { Toaster, toast } from "react-hot-toast";
 import axios from "axios";
 import { BlogContext } from "../pages/blog.page";
 
-const CommentField = ({ action }) => {
+const CommentField = ({
+  action,
+  index = undefined,
+  replyingTo = undefined,
+  setReplying,
+}) => {
   const [comment, setComment] = useState("");
   let access_token = useContext(UserContext)?.userAuth?.access_token || null;
 
@@ -15,7 +20,7 @@ const CommentField = ({ action }) => {
     blog: {
       _id,
       author: { _id: blog_author },
-      comments: { results: commentArr },
+      comments: { results: commentsArr },
       comments,
       activity,
       activity: { total_comments, total_parent_comments },
@@ -24,6 +29,7 @@ const CommentField = ({ action }) => {
     setBlog,
     setTotalParentCommentsLoaded,
   } = useContext(BlogContext);
+  // console.log(blog);
 
   const handleComment = (e) => {
     if (!access_token) {
@@ -35,7 +41,7 @@ const CommentField = ({ action }) => {
     axios
       .post(
         import.meta.env.VITE_SERVER_DOMAIN + "/add-comment",
-        { _id, blog_author, comment },
+        { _id, blog_author, comment, replying_to: replyingTo },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -43,12 +49,23 @@ const CommentField = ({ action }) => {
         }
       )
       .then(({ data }) => {
-        data.commented_By = {
+        setComment("");
+        console.log(data);
+        data.commented_by = {
           personal_info: { username, profile_img, fullname },
         };
+
         let newCommentArr;
-        data.childrenLevel = 0;
-        newCommentArr = [data, ...commentArr];
+        if (replyingTo) {
+          commentsArr[index].children.push(data._id);
+          data.childrenLevel = commentsArr[index].childrenLevel + 1;
+          data.parentIndex = index;
+          commentsArr[index].isReplyLoaded = true;
+          commentsArr.splice(index + 1, 0, data);
+        } else {
+          data.childrenLevel = 0;
+          newCommentArr = [data, ...commentsArr];
+        }
 
         let parentCommentIncrementVal = 1;
         setBlog({

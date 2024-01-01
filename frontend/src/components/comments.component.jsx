@@ -79,16 +79,18 @@ const CommentsContainer = () => {
       </div>
       <hr className="border-grey my-8 w-[120%] -ml-10" />
       <CommentField action={"Submit"} />
-      {commentsArr && commentsArr?.length ? (
+      {commentsArr && commentsArr?.length && commentsArr?.length > 0 ? (
         commentsArr?.map((comment, i) => {
+          // console.log(comment);
           return (
             <AnimationWrapper key={i}>
               <CommentCard
                 index={i}
+                leftVal={comment?.childrenLevel * 4}
                 commentData={comment}
-                leftVal={comment.childrenLevel * 4}
               />
             </AnimationWrapper>
+            // comment.comment
           );
         })
       ) : (

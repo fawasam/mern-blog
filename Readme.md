@@ -101,7 +101,7 @@ VIDEO 04
 03:53:48 - Section 12 - Comments - Fetching Comment
 04:10:47 - Section 13 - Comments - Creating Comments cards
 04:27:40 - Section 14 - Comments - Comments Paginatio
-04:37:15 - Section 15 - Comments - Replying to comments
+04:37:15 - Section 15 - Comments - Replying to comments✅
 05:06:05 - Section 16 - Comments - Hiding & Loading Replies
 05:34:28 - Section 17 - Comments - Deleting Comments & replies
 06:08:27 - Outro
