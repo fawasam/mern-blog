@@ -46,6 +46,7 @@ const CommentsContainer = () => {
     setTotalParentCommentsLoaded,
     setBlog,
   } = useContext(BlogContext);
+  // console.log(commentsArr);
 
   const loadMoreComments = async () => {
     let newCommentsArr = await fetchComments({
@@ -81,7 +82,6 @@ const CommentsContainer = () => {
       <CommentField action={"Submit"} />
       {commentsArr && commentsArr?.length && commentsArr?.length > 0 ? (
         commentsArr?.map((comment, i) => {
-          // console.log(comment);
           return (
             <AnimationWrapper key={i}>
               <CommentCard
@@ -90,7 +90,6 @@ const CommentsContainer = () => {
                 commentData={comment}
               />
             </AnimationWrapper>
-            // comment.comment
           );
         })
       ) : (

@@ -15,6 +15,7 @@ import serviceAccountKey from "./blog-app-2de5c-firebase-adminsdk-axh0x-4675b40f
 import admin from "firebase-admin";
 import userRoutes from "./routes/userRoutes.js";
 import Comment from "./Schema/Comment.js";
+import { populate } from "dotenv";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -558,6 +559,7 @@ app.post("/add-comment", verifyJWT, (req, res) => {
 
   if (replying_to) {
     commentObj.parent = replying_to;
+    commentObj.isReply = true;
   }
 
   new Comment(commentObj)
@@ -627,6 +629,35 @@ app.post("/get-post-comments", (req, res) => {
     .sort({ commentedAt: -1 })
     .then((comment) => {
       return res.status(200).json(comment);
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/get-replies", (req, res) => {
+  let { _id, skip } = req.body;
+
+  let maxLimit = 5;
+  Comment.findOne({ _id })
+    .populate({
+      path: "children",
+      option: {
+        limit: maxLimit,
+        skip: skip,
+        sort: { commentedAt: -1 },
+      },
+      populate: {
+        path: "commented_by",
+        select:
+          "personal_info.profile_img personal_info.fullname personal_info.username",
+      },
+      select: "-blog_id -updatedAt",
+    })
+    .select("children")
+    .then((doc) => {
+      return res.status(200).json({ replies: doc.children });
     })
     .catch((err) => {
       console.log(err.message);
