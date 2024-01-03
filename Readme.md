@@ -103,11 +103,11 @@ VIDEO 04
 04:27:40 - Section 14 - Comments - Comments Paginatio
 04:37:15 - Section 15 - Comments - Replying to comments✅
 05:06:05 - Section 16 - Comments - Hiding & Loading Replies
-05:34:28 - Section 17 - Comments - Deleting Comments & replies
+05:34:28 - Section 17 - Comments - Deleting Comments & replies✅
 06:08:27 - Outro
 
 VIDEO 05
-00:00 - Intro
+00:00 - Intro✅
 00:35 - Section 1 - Load more replies
 23:46 - Section 2 - "settings" route
 27:41 - Section 3 - Side Navbar
