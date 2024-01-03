@@ -2,6 +2,9 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import User from "../Schema/User.js";
 import { nanoid } from "nanoid";
+import Comment from "../Schema/Comment.js";
+import Notification from "../Schema/Notification.js";
+import Blog from "../Schema/Blog.js";
 
 const formatDatatoSend = (user) => {
   const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
@@ -39,4 +42,46 @@ const verifyJWT = (req, res, next) => {
   });
 };
 
-export { formatDatatoSend, generateUsername, verifyJWT };
+const deleteComments = (_id) => {
+  Comment.findOneAndDelete({ _id })
+    .then((comment) => {
+      if (comment?.parent) {
+        Comment.findOneAndUpdate(
+          { _id: comment.parent },
+          { $pull: { children: _id } }
+        )
+          .then((data) => console.log("Comment delete from parent"))
+          .catch((err) => console.log(err));
+      }
+
+      Notification.findOneAndDelete({ comment: _id }).then((notification) =>
+        console.log("Comment notification deleted")
+      );
+      Notification.findOneAndDelete({ reply: _id }).then((notification) =>
+        console.log("Reply notification deleted")
+      );
+
+      Blog.findOneAndUpdate(
+        { _id: comment.blog_id },
+        {
+          $pull: { comments: _id },
+          $inc: {
+            "activity.total_comments": -1,
+            "activity.total_parent_comments": comment.parent ? 0 : -1,
+          },
+        }
+      ).then((blog) => {
+        console.log("blog updated");
+        if (comment?.children?.length) {
+          comment?.children?.map((replies) => {
+            deleteComments(replies);
+          });
+        }
+      });
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
+
+export { formatDatatoSend, generateUsername, verifyJWT, deleteComments };

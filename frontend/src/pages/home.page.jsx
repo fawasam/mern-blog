@@ -9,6 +9,15 @@ import MinimalBlogPost from "../components/nobanner-blog-post.component";
 import NoDataMessage from "../components/nodata.component";
 import { filterPaginationData } from "../common/filter-pagination-data";
 import LoadMoreDataBtn from "../components/load-more.component";
+export const TrendingblogStructure = {
+  title: "",
+  _id: "",
+  desc: "",
+  content: [],
+  author: { personal_info: {} },
+  banner: "",
+  publishedAt: "",
+};
 
 const HomePage = () => {
   const [blogs, setBlogs] = useState(null);
@@ -67,7 +76,6 @@ const HomePage = () => {
           countRoute: "/search-posts-count",
           data_to_send: { tag: pageState },
         });
-        console.log(formatedData);
         setBlogs(formatedData);
       })
       .catch((err) => {
@@ -157,7 +165,7 @@ const HomePage = () => {
                 Stories from all interesets
               </h1>
               <div className="flex gap-3 flex-wrap">
-                {categories.map((category, i) => {
+                {categories?.map((category, i) => {
                   return (
                     <button
                       key={i}
@@ -181,8 +189,8 @@ const HomePage = () => {
               </h1>
               {trendingBlogs == null ? (
                 <Loader />
-              ) : trendingBlogs.length ? (
-                trendingBlogs.map((blog, i) => {
+              ) : trendingBlogs?.length ? (
+                trendingBlogs?.map((blog, i) => {
                   return (
                     <AnimationWrapper
                       transition={{ duration: 1, delay: i * 0.1 }}

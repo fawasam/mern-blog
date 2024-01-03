@@ -16,6 +16,7 @@ import admin from "firebase-admin";
 import userRoutes from "./routes/userRoutes.js";
 import Comment from "./Schema/Comment.js";
 import { populate } from "dotenv";
+import { deleteComments } from "./utils/helpers.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -663,6 +664,20 @@ app.post("/get-replies", (req, res) => {
       console.log(err.message);
       return res.status(500).json({ error: err.message });
     });
+});
+
+app.post("/delete-comment", verifyJWT, (req, res) => {
+  let user_id = req.user;
+  let { _id } = req.body;
+
+  Comment.findOne({ _id }).then((comment) => {
+    if (user_id == comment.commented_by || user_id == comment.blog_author) {
+      deleteComments(_id);
+      return res.status(200).json({ status: "done" });
+    } else {
+      return res.status(403).json({ error: "You can not delete this comment" });
+    }
+  });
 });
 
 app.listen(PORT, () => {
