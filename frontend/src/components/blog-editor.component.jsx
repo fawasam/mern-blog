@@ -23,6 +23,7 @@ export const handleBannerUpload = (e) => {
     .post(import.meta.env.VITE_SERVER_DOMAIN + "/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${access_token}`,
       },
     })
     .then((response) => {
