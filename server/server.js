@@ -95,7 +95,8 @@ app.post("/upload", (req, res) => {
     if (err) {
       res.status(400).send("Error uploading file.");
     } else {
-      const imageUrl = "http://localhost:3000/uploads/" + req.file.filename;
+      const imageUrl =
+        process.env.SERVER_URL_PRODUCTION + "/uploads/" + req.file.filename;
       res.status(200).json({ imageUrl: imageUrl });
     }
   });
