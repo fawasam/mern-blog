@@ -73,6 +73,8 @@ mongoose
 
 app.use(express.json());
 app.use(cors());
+let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
+let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
 const storage = multer.diskStorage({
   destination: "./uploads/",
@@ -678,6 +680,75 @@ app.post("/delete-comment", verifyJWT, (req, res) => {
       return res.status(403).json({ error: "You can not delete this comment" });
     }
   });
+});
+
+//userRoute
+app.post("/change-password", verifyJWT, (req, res) => {
+  let { currentPassword, newPassword } = req.body;
+
+  if (currentPassword == newPassword) {
+    return res.status(403).json({
+      error: "Please change your password to new password",
+    });
+  }
+  if (
+    !passwordRegex.test(currentPassword) ||
+    !passwordRegex.test(newPassword)
+  ) {
+    return res.status(403).json({
+      error:
+        "Password should be 6 to 20 characters long with a numeric, 1 lowercase and 1 uppercase letters ",
+    });
+  }
+
+  User.findOne({ _id: req.user })
+    .then((user) => {
+      if (user.google_auth) {
+        return res.status(403).json({
+          error:
+            "You can't change account's password because you logged in through Google",
+        });
+      }
+
+      bcrypt.compare(
+        currentPassword,
+        user.personal_info.password,
+        (err, result) => {
+          if (err) {
+            return res.status(500).json({
+              error:
+                "Some error occured while changing the password, please try again later",
+            });
+          }
+          if (!result) {
+            return res.status(403).json({
+              error: "Incorrect password, please try again later",
+            });
+          }
+
+          bcrypt.hash(newPassword, 10, (err, hashed_password) => {
+            User.findOneAndUpdate(
+              { _id: req.user },
+              { "personal_info.password": hashed_password }
+            )
+              .then((u) => {
+                return res.status(200).json({ status: "Password updated" });
+              })
+              .catch((err) => {
+                return res.status(500).json({
+                  error:
+                    "Some error occurred while saving new password Please try again later",
+                });
+              });
+          });
+        }
+      );
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        error: "User not found",
+      });
+    });
 });
 
 app.listen(PORT, () => {

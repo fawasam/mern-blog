@@ -25,11 +25,11 @@ const SideNav = () => {
   };
   useEffect(() => {
     setShowSideNav(false);
-    pageStateTab.current.click();
+    pageStateTab?.current?.click();
   }, [pageState]);
 
   return access_token === null ? (
-    <Navigate to={"/sigin"} />
+    <Navigate to={"/signin"} />
   ) : (
     <>
       <section className="relative flex gap-10 py-0 m-0 max-md:flex-col">

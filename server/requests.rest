@@ -1,4 +1,4 @@
-# POST http://localhost:3000/signup 
+# POST http://localhost:3000/signin
 # Content-Type: application/json
 
 # {
@@ -24,16 +24,18 @@
 # }
 
 # GET http://localhost:3000/trending-post 
-POST http://localhost:3000/get-posts
-Content-Type: application/json
-
-{
-    "blog_id":"AI-predictions-Top-13-AI-trends-for-20246VcbasMRYdbpG8ZiXLb5w"
-}
-
-# POST http://localhost:3000/get-profile
+# POST http://localhost:3000/get-posts
 # Content-Type: application/json
 
 # {
-#     "username":"fawasam5"
+#     "blog_id":"AI-predictions-Top-13-AI-trends-for-20246VcbasMRYdbpG8ZiXLb5w"
 # }
+
+POST http://localhost:3000/change-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OTUxMjAyMTUwZjZhMjhiMDk2ZDZjZCIsImlhdCI6MTcwNDM0OTYwMn0.h_tn-SY1n2382TY5upcUv1WbS9xo--H6ZCMt_j2vtKE
+
+{
+    "currentPassword":"Fawas@01",
+    "newPassword":"Fawas@02"
+}
