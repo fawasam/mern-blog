@@ -754,10 +754,7 @@ app.post("/change-password", verifyJWT, (req, res) => {
 app.post("/update-profile-img", verifyJWT, (req, res) => {
   let { url } = req.body;
 
-  User.findOneAndUpdate(
-    { _id: req.user },
-    { "personal_info.profile_img:": url }
-  )
+  User.findOneAndUpdate({ _id: req.user }, { "personal_info.profile_img": url })
     .then(() => {
       return res.status(200).json({ profile_img: url });
     })

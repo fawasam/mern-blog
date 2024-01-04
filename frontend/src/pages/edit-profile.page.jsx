@@ -59,7 +59,6 @@ const EditProfile = () => {
         })
         .then((response) => {
           const url = response.data.imageUrl;
-          console.log("Image URL:", url);
           if (url) {
             axios
               .post(
