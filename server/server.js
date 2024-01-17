@@ -17,7 +17,7 @@ import userRoutes from "./routes/userRoutes.js";
 import Comment from "./Schema/Comment.js";
 import { populate } from "dotenv";
 import { deleteComments } from "./utils/helpers.js";
-
+import { cacheMiddleware } from "./utils/cache.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -75,6 +75,7 @@ mongoose
 
 app.use(express.json());
 app.use(cors());
+app.use(cacheMiddleware(60));
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
@@ -843,6 +844,30 @@ app.get("/new-notification", verifyJWT, (req, res) => {
       return res.status(500).json({ error: err.message });
     });
 });
+
+app.post("/notifications", verifyJWT, (req, res) => {
+  let user_id = req.id;
+
+  let { page, filter, deletedDocCount } = re.body;
+
+  let maxLimit = 10;
+
+  let findQuery = {
+    notification_for: user_id,
+    user: { $ne: user_id },
+  };
+
+  let skipDocs = (page - 1) * maxLimit;
+
+  if (filter != "all") {
+    findQuery.type = filter;
+  }
+
+  if (deletedDocCount) {
+    skipDocs -= deletedDocCount;
+  }
+});
+// 26;//
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
