@@ -7,7 +7,9 @@ const SideNav = () => {
   let page = location.pathname.split("/")[2];
   const [pageState, setPageState] = useState(page.replace("-", " "));
   const [showSideNav, setShowSideNav] = useState(false);
-
+  const {
+    userAuth: { new_notification_available },
+  } = useContext(UserContext);
   let activeTabLine = useRef();
   let sideBarIcon = useRef();
   let pageStateTab = useRef();
@@ -79,7 +81,12 @@ const SideNav = () => {
               onClick={(e) => setPageState(e.target.innerText)}
               className="sidebar-link"
             >
-              <i className="fi fi-rr-bell"></i>
+              <div className="relative">
+                <i className="fi fi-rr-bell"></i>
+                {new_notification_available && (
+                  <span className="bg-red w-2 h-2 rounded-full absolute z-10 top-0 right-0 "></span>
+                )}
+              </div>
               Notification
             </NavLink>
             <NavLink

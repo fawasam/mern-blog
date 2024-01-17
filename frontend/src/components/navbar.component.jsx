@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import axios from "axios";
 import logo from "../imgs/logo.png";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
@@ -10,6 +11,12 @@ const Navbar = () => {
 
   let access_token = useContext(UserContext)?.userAuth?.access_token || null;
   let profile_img = useContext(UserContext)?.userAuth?.profile_img || null;
+
+  const {
+    setUserAuth,
+    userAuth,
+    userAuth: { new_notification_available },
+  } = useContext(UserContext);
 
   const handleUserNavPanel = () => {
     setUserNavPanel((currentVal) => !currentVal);
@@ -26,12 +33,30 @@ const Navbar = () => {
       navigate(`/search/${query}`);
     }
   };
+
+  useEffect(() => {
+    if (access_token) {
+      axios
+        .get(import.meta.env.VITE_SERVER_DOMAIN + "/new-notification", {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        })
+        .then(({ data }) => {
+          setUserAuth({ ...userAuth, ...data });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [access_token]);
   return (
     <>
       <nav className="navbar z-50">
         <Link to="/" className="flex-none w-10">
           <img src={logo} alt="logo-image" className="w-full" />
         </Link>
+        {new_notification_available}
         <div
           className={`absolute bg-white w-full left-0 top-full mt-0.5  border-gray py-4 px-[5vw] md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto ${
             searchBoxVisibility ? "show " : " hide"
@@ -63,6 +88,9 @@ const Navbar = () => {
               <Link to="/dashboard/notification" k>
                 <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
                   <i className="fi fi-rr-bell text-2xl block mt-1"></i>
+                  {new_notification_available && (
+                    <span className="bg-red w-3 h-3 rounded-full absolute z-10 top-2 right-2 "></span>
+                  )}
                 </button>
               </Link>
               <div

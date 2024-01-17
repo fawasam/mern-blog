@@ -20,6 +20,8 @@ import { deleteComments } from "./utils/helpers.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const SERVER_URL = process.env.SERVER_URL_DEVELOPMENT;
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey),
 });
@@ -95,8 +97,7 @@ app.post("/upload", (req, res) => {
     if (err) {
       res.status(400).send("Error uploading file.");
     } else {
-      const imageUrl =
-        process.env.SERVER_URL_PRODUCTION + "/uploads/" + req.file.filename;
+      const imageUrl = SERVER_URL + "/uploads/" + req.file.filename;
       res.status(200).json({ imageUrl: imageUrl });
     }
   });
@@ -821,6 +822,27 @@ app.post("/update-profile", verifyJWT, (req, res) => {
     });
 });
 
+//notification
+
+app.get("/new-notification", verifyJWT, (req, res) => {
+  let user_id = req.user;
+  Notification.exists({
+    notification_for: user_id,
+    seen: false,
+    // user: { $ne: user_id },
+  })
+    .then((result) => {
+      if (result) {
+        return res.status(200).json({ new_notification_available: true });
+      } else {
+        return res.status(200).json({ new_notification_available: false });
+      }
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
