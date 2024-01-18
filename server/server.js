@@ -75,7 +75,7 @@ mongoose
 
 app.use(express.json());
 app.use(cors());
-app.use(cacheMiddleware(60));
+// app.use(cacheMiddleware(60));
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
@@ -546,7 +546,7 @@ app.post("/isliked-by-user", verifyJWT, (req, res) => {
 //comment
 app.post("/add-comment", verifyJWT, (req, res) => {
   let user_id = req.user;
-  let { _id, comment, blog_author, replying_to } = req.body;
+  let { _id, comment, blog_author, replying_to, notification_id } = req.body;
   console.log(replying_to);
   if (!comment.length) {
     return res
@@ -601,6 +601,15 @@ app.post("/add-comment", verifyJWT, (req, res) => {
         ).then((replyingToCommentDoc) => {
           notificationObj.notification_for = replyingToCommentDoc.commented_by;
         });
+
+        if (notification_id) {
+          Notification.findOneAndUpdate(
+            { _id: notification_id },
+            { reply: commentFile._id }
+          ).then((notification) => {
+            console.log("notification updated");
+          });
+        }
       }
       new Notification(notificationObj).save().then(() => {
         console.log("New notification created");
@@ -830,7 +839,7 @@ app.get("/new-notification", verifyJWT, (req, res) => {
   Notification.exists({
     notification_for: user_id,
     seen: false,
-    // user: { $ne: user_id },
+    user: { $ne: user_id },
   })
     .then((result) => {
       if (result) {
@@ -846,9 +855,9 @@ app.get("/new-notification", verifyJWT, (req, res) => {
 });
 
 app.post("/notifications", verifyJWT, (req, res) => {
-  let user_id = req.id;
+  let user_id = req.user;
 
-  let { page, filter, deletedDocCount } = re.body;
+  let { page, filter, deletedDocCount } = req.body;
 
   let maxLimit = 10;
 
@@ -866,8 +875,56 @@ app.post("/notifications", verifyJWT, (req, res) => {
   if (deletedDocCount) {
     skipDocs -= deletedDocCount;
   }
+
+  Notification.find(findQuery)
+    .skip(skipDocs)
+    .limit(maxLimit)
+    .populate("blog", "title blog_id")
+    .populate(
+      "user",
+      "personal_info.fullname personal_info.username personal_info.profile_img"
+    )
+    .populate("comment", "comment")
+    .populate("replied_on_comment", "comment")
+    .populate("reply", "comment")
+    .sort({ createdAt: -1 })
+    .select("createdAt type seen reply")
+    .then((notifications) => {
+      Notification.updateMany(findQuery, { seen: true })
+        .skip(skipDocs)
+        .limit(maxLimit)
+        .then(() => console.log("Notification seen"));
+      return res.status(200).json({ notifications });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
 });
-// 26;//
+
+app.post("/all-notifications-count", verifyJWT, (req, res) => {
+  let user_id = req.user;
+  let { filter } = req.body;
+
+  let findQuery = {
+    notification_for: user_id,
+    user: { $ne: user_id },
+  };
+
+  if (filter != "all") {
+    findQuery.type = filter;
+  }
+
+  Notification.countDocuments(findQuery)
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
