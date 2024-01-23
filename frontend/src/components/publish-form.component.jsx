@@ -95,7 +95,7 @@ const PublishForm = () => {
         toast.dismiss(loadingToast);
         toast.success("Published 👍");
         setTimeout(() => {
-          navigate("/");
+          navigate("/dashborad/blogs");
         }, 500);
       })
       .catch(({ response }) => {

@@ -1,16 +1,19 @@
 import React, { useContext, useRef } from "react";
 import { Link } from "react-router-dom";
-import logo from "../imgs/logo.png";
 import AnimationWrapper from "../common/page-animation";
-import defaultBanner from "../imgs/blog banner.png";
 import axios from "axios";
 import { Toaster, toast } from "react-hot-toast";
 import { EditorContext } from "../pages/editor.pages";
 import EditorJS from "@editorjs/editorjs";
 import { useEffect } from "react";
 import { tools } from "./tools.component";
-import { UserContext } from "../App";
+import { ThemeContext, UserContext } from "../App";
 import { useNavigate, useParams } from "react-router-dom";
+
+import DarkLogo from "../imgs/logo-dark.png";
+import LightLogo from "../imgs/logo-light.png";
+import darkBlogBanner from "../imgs/blog banner dark.png";
+import lightBlogBanner from "../imgs/blog banner light.png";
 
 export const handleBannerUpload = (e) => {
   let img = e.target.files[0];
@@ -40,16 +43,13 @@ export const handleBannerUpload = (e) => {
     });
 };
 const BlogEditor = () => {
+  let { theme, setTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const { blog_id } = useParams();
-  let {
-    blog: { title, banner, content, tags, desc },
-    blog,
-    setBlog,
-    textEditor,
-    setTextEditor,
-    setEditorState,
-  } = useContext(EditorContext);
+  let { blog, setBlog, textEditor, setTextEditor, setEditorState } =
+    useContext(EditorContext);
+
+  let { title, banner, content, tags, desc } = blog;
 
   let access_token = useContext(UserContext)?.userAuth?.access_token || null;
 
@@ -164,7 +164,7 @@ const BlogEditor = () => {
             toast.dismiss(loadingToast);
             toast.success("Saved 👍");
             setTimeout(() => {
-              navigate("/");
+              navigate("/dashboard/blogs?tab=draft");
             }, 500);
           })
           .catch(({ response }) => {
@@ -179,7 +179,7 @@ const BlogEditor = () => {
     <>
       <nav className="navbar">
         <Link to={"/"} className="flex-none w-10">
-          <img src={logo} alt="image" />
+          <img src={theme == "light" ? DarkLogo : LightLogo} alt="image" />
         </Link>
         <p className="max-md:hidden text-black line-clamp-1 w-full">
           {title?.length ? title : "New Blog"}
@@ -200,7 +200,7 @@ const BlogEditor = () => {
             <div className="relative aspect-video bg-white border-4 border-grey hove:opacity-80">
               <label htmlFor="uploadBanner">
                 <img
-                  src={banner}
+                  src={theme == "light" ? lightBlogBanner : darkBlogBanner}
                   alt="image"
                   className="z-20"
                   onError={handleError}
@@ -217,7 +217,7 @@ const BlogEditor = () => {
             <textarea
               defaultValue={title}
               placeholder="Blog Title"
-              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40 "
+              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40 bg-white "
               onKeyDown={handleTitleKeyDown}
               onChange={handleTitleChange}
             ></textarea>

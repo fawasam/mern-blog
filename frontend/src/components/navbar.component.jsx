@@ -1,13 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import logo from "../imgs/logo.png";
+import darkLogo from "../imgs/logo-dark.png";
+import lightLogo from "../imgs/logo-light.png";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { UserContext } from "../App";
+import { ThemeContext, UserContext } from "../App";
 import { UserNavigationPanel } from "./user-navigation.component";
+import { storeInSession } from "../common/session";
 const Navbar = () => {
   let navigate = useNavigate();
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(true);
   const [userNavPanel, setUserNavPanel] = useState(false);
+
+  let { theme, setTheme } = useContext(ThemeContext);
 
   let access_token = useContext(UserContext)?.userAuth?.access_token || null;
   let profile_img = useContext(UserContext)?.userAuth?.profile_img || null;
@@ -34,6 +38,13 @@ const Navbar = () => {
     }
   };
 
+  const handleThemeChange = () => {
+    let newTheme = theme == "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.body.setAttribute("data-theme", newTheme);
+    storeInSession("theme", newTheme);
+  };
+
   useEffect(() => {
     if (access_token) {
       axios
@@ -54,7 +65,11 @@ const Navbar = () => {
     <>
       <nav className="navbar z-50">
         <Link to="/" className="flex-none w-10">
-          <img src={logo} alt="logo-image" className="w-full" />
+          <img
+            src={theme == "light" ? darkLogo : lightLogo}
+            alt="logo-image"
+            className="w-full"
+          />
         </Link>
         {new_notification_available}
         <div
@@ -85,6 +100,16 @@ const Navbar = () => {
 
           {access_token ? (
             <>
+              <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
+                <i
+                  className={
+                    "fi fi-rr-" +
+                    (theme == "light" ? "moon-stars" : "sun") +
+                    " text-2xl block mt-1"
+                  }
+                  onClick={handleThemeChange}
+                ></i>
+              </button>
               <Link to="/dashboard/notifications">
                 <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
                   <i className="fi fi-rr-bell text-2xl block mt-1"></i>
