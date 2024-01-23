@@ -114,6 +114,10 @@ const userSchema = mongoose.Schema(
       ref: "blogs",
       default: [],
     },
+    admin: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: {
